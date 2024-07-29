@@ -20,12 +20,11 @@ create table Vehiculos (
 
 -- Crear la tabla DetallesVehiculos (One-to-One con Vehiculos)
 create table DetallesVehiculos (
-    vehiculo_id INT PRIMARY KEY,
+    id_detalle INT auto_increment primary key,
     color VARCHAR(30),
     kilometraje INT,
     tipo_combustible VARCHAR(30),
-    transmision VARCHAR(30),
-    constraint fk_vehiculo_detalle foreign key (vehiculo_id) references Vehiculos(id)
+    transmision VARCHAR(30)
 );
 
 -- Crear la tabla Clientes
@@ -62,6 +61,12 @@ create table VehiculoExtras (
     primary key (vehiculo_id, extra_id)
 );
 
+
+
+-- ---------------------------------------------------------------
+
+
+
 -- Insertar marcas
 INSERT INTO Marcas (nombre) VALUES 
 ('Toyota'), 
@@ -89,17 +94,17 @@ INSERT INTO Vehiculos (marca_id, modelo, anio, precio) VALUES
 (10, 'Sportage', 2019, 22000.00);
 
 -- Insertar detalles de vehículos
-INSERT INTO DetallesVehiculos (vehiculo_id, color, kilometraje, tipo_combustible, transmision) VALUES
-(1, 'Rojo', 50000, 'Gasolina', 'Automática'),
-(2, 'Azul', 30000, 'Gasolina', 'Manual'),
-(3, 'Negro', 10000, 'Gasolina', 'Automática'),
-(4, 'Blanco', 40000, 'Gasolina', 'Automática'),
-(5, 'Gris', 25000, 'Diesel', 'Manual'),
-(6, 'Negro', 15000, 'Gasolina', 'Automática'),
-(7, 'Azul', 5000, 'Gasolina', 'Automática'),
-(8, 'Blanco', 60000, 'Gasolina', 'Manual'),
-(9, 'Rojo', 35000, 'Gasolina', 'Automática'),
-(10, 'Gris', 30000, 'Gasolina', 'Manual');
+INSERT INTO DetallesVehiculos (color, kilometraje, tipo_combustible, transmision) VALUES
+('Rojo', 50000, 'Gasolina', 'Automática'),
+('Azul', 30000, 'Gasolina', 'Manual'),
+('Negro', 10000, 'Gasolina', 'Automática'),
+('Blanco', 40000, 'Gasolina', 'Automática'),
+('Gris', 25000, 'Diesel', 'Manual'),
+('Negro', 15000, 'Gasolina', 'Automática'),
+('Azul', 5000, 'Gasolina', 'Automática'),
+('Blanco', 60000, 'Gasolina', 'Manual'),
+('Rojo', 35000, 'Gasolina', 'Automática'),
+('Gris', 30000, 'Gasolina', 'Manual');
 
 -- Insertar clientes
 INSERT INTO Clientes (nombre, email, telefono) VALUES
@@ -152,3 +157,149 @@ INSERT INTO VehiculoExtras (vehiculo_id, extra_id) VALUES
 (8, 2), (8, 3), (8, 4),
 (9, 5), (9, 6), (9, 7),
 (10, 8), (10, 9), (10, 10);
+
+
+
+-- ---------------------------------------------------------------
+
+
+
+-- Modificar la tabla Vehiculos para añadir la columna detalle_id
+alter table Vehiculos
+    add column detalle_id INT,
+    add constraint fk_detalle foreign key (detalle_id) references DetallesVehiculos (id_detalle);
+
+-- Actualizar la tabla DetallesVehiculos para añadir la columna vehiculo_id
+alter table DetallesVehiculos
+	add column vehiculo_id INT,
+    add constraint fk_vehiculo_id foreign key (vehiculo_id) references Vehiculos(id);
+
+-- Actualizar los valores de detalle_id en Vehiculos
+update Vehiculos
+set detalle_id = id;
+
+-- Actualizar los valores de vehiculo_id en DetallesVehiculos
+update DetallesVehiculos
+set vehiculo_id = id_detalle;
+
+
+
+-- ---------------------------------------------------------------
+
+
+
+-- Consultas Simples
+
+-- 1. Seleccionar el nombre y el precio de todos los vehículos ordenando por precio
+select modelo, precio from Vehiculos
+order by precio;
+
+-- 2. Seleccionar todos los clientes.
+select * from Clientes;
+
+-- 3. Seleccionar el nombre de la marca de un modelo específico (por ejemplo, con id = 2)
+select nombre from Marcas where id = 2;
+
+-- 4. Seleccionar el nombre y el email de un cliente específico (por ejemplo, con id = 3)
+select nombre, email from Clientes where id = 3;
+
+-- 5. Seleccionar los nombres de los vehículos y sus colores, ordenando por color.
+select Vehiculos.modelo, DetallesVehiculos.color
+from Vehiculos
+join DetallesVehiculos on Vehiculos.id = DetallesVehiculos.vehiculo_id
+order by color;
+
+-- 6. Seleccionar los modelos de vehículos fabricados después del año 2020
+select modelo from Vehiculos where anio >= 2020;
+
+-- 7. Número de extras disponibles.
+select count(nombre) as Extras_disponibles from Extras;
+
+-- 8. Seleccionar los nombres de 3 clientes y sus números de teléfono
+select nombre, telefono from Clientes limit 0,3;
+
+-- 9. Seleccionar los modelos de vehículos que tienen un precio entre 15000 y 30000
+select modelo, precio from Vehiculos where precio between 15000 and 30000;
+
+-- 10. Seleccionar las fecha de todas las ventas realizadas en 2023
+select * from Ventas where fecha between "2023-01-01" and "2023-12-31";
+
+
+
+-- ---------------------------------------------------------------
+
+
+
+-- Consultas Complejas:
+
+-- 1. La marca y modelo de todos los vehículos:
+select Marcas.nombre as marca, Vehiculos.modelo  
+from Vehiculos
+join Marcas on Vehiculos.marca_id = Marcas.id;
+
+-- 2. Clientes que han comprado un vehículo con un precio mayor a 30000
+select Clientes.nombre
+from Clientes
+join Ventas on Clientes.id = Ventas.cliente_id
+where Ventas.precio_venta > 30000;
+
+-- 3. El número de ventas para cada modelo
+select Vehiculos.modelo, count(Ventas.id) as numero_ventas
+from Vehiculos
+join Ventas on Vehiculos.id = Ventas.vehiculo_id
+group by Vehiculos.modelo;
+
+-- 4. El nombre del cliente y el modelo del vehículo (para cada venta).
+select c.nombre as Cliente, v.modelo as Modelo, ve.fecha as Fecha, ve.precio_venta as Precio
+from Ventas ve
+join Clientes c on ve.cliente_id = c.id
+join (select * from Vehiculos where anio > 2015) v on ve.vehiculo_id = v.id;
+
+-- 5. Clientes que han comprado más de un vehículo
+select Clientes.nombre, count(Ventas.id) as numero_compras
+from Clientes
+join Ventas on Clientes.id = Ventas.cliente_id
+group by Clientes.nombre
+having count(Ventas.id) > 1;
+
+-- 6. Marcas Premium (que tienen vehículos un precio medio mayor a 25000)
+select Marcas.nombre
+from Vehiculos
+join Marcas on Vehiculos.marca_id = Marcas.id
+group by Marcas.nombre
+having avg(Vehiculos.precio) > 25000;
+
+-- 7. Vehículos en venta
+select Vehiculos.modelo
+from Vehiculos
+left join Ventas on Vehiculos.id = Ventas.vehiculo_id
+where Ventas.id is null;
+
+-- 8. Todos los vehículos con el número de extras que tienen:
+select Vehiculos.modelo as Coche, count(VehiculoExtras.extra_id) as Total_extras
+from Vehiculos
+join VehiculoExtras on Vehiculos.id = VehiculoExtras.vehiculo_id
+group by Vehiculos.modelo;
+
+-- 9. Cliente con la mayor cantidad de dinero gastado
+select Clientes.nombre, sum(Ventas.precio_venta) as total_gastado
+from Clientes
+join Ventas on Clientes.id = Ventas.cliente_id
+group by Clientes.nombre
+order by total_gastado desc
+limit 1;
+
+-- 10. Vehículos vendidos de color rojo.
+select Vehiculos.modelo
+from Vehiculos
+join DetallesVehiculos on Vehiculos.id = DetallesVehiculos.vehiculo_id
+join Ventas on Vehiculos.id = Ventas.vehiculo_id
+where DetallesVehiculos.color = 'Rojo';
+
+
+
+-- ---------------------------------------------------------------
+
+
+
+-- Funciones:
