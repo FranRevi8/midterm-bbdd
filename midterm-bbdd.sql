@@ -278,4 +278,87 @@ where VehicleDetails.color = 'Red';
 
 
 
--- Funciones:
+-- Functions:
+
+-- When a vehicle is added, we will trigger the addition of extras (and a brand if is new). 
+-- **Not being capable of doing it with triggers, I decided to do it with a Procedure:** (I will add the trigger tests in the README)
+
+DELIMITER $$
+
+create procedure insert_vehicle_with_brand_and_details(
+    in p_brand_name VARCHAR(50),
+    in p_model VARCHAR(50),
+    in p_year INT,
+    in p_price DECIMAL(10, 2)
+)
+begin
+    declare v_brand_id INT;
+    declare v_vehicle_id INT;
+    declare v_detail_id INT;
+
+    -- Check if the brand exists
+    select id into v_brand_id
+    from Brands
+    where name = p_brand_name;
+
+    -- Insert the brand if not exists
+    if v_brand_id is null then
+        insert into Brands (name) values (p_brand_name);
+        set v_brand_id = LAST_INSERT_ID();
+    end if;
+
+    -- Insert the vehicle
+    insert into Vehicles (brand_id, model, year, price)
+    values (v_brand_id, p_model, p_year, p_price);
+    set v_vehicle_id = LAST_INSERT_ID();
+
+    -- Insert the details of the vehicle
+    insert into VehicleDetails (vehicle_id, color, mileage, fuel_type, transmission)
+    values (v_vehicle_id, '-', 0, '-', '-');
+    set v_detail_id = LAST_INSERT_ID();
+
+    -- Link the vehicle with its details
+    update Vehicles
+    set detail_id = v_detail_id
+    where id = v_vehicle_id;
+end$$
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
