@@ -325,8 +325,33 @@ end$$
 
 DELIMITER ;
 
+DELIMITER $$
 
+create procedure delete_vehicle_and_details(in p_vehicle_id INT)
+begin
+    declare v_sales_count INT;
 
+    -- Check if the vehicle has been sold
+    select count(*) into v_sales_count from Sales where vehicle_id = p_vehicle_id;
+
+    if v_sales_count = 0 then
+        -- Put the foreign keys off
+        set FOREIGN_KEY_CHECKS = 0;
+        
+        -- Delete vehicle details
+        delete from VehicleDetails where vehicle_id = p_vehicle_id;
+        -- Delete vehicle itself
+        delete from Vehicles where id = p_vehicle_id;
+        
+        -- Reactivate the foreign keys
+        set FOREIGN_KEY_CHECKS = 1;
+    else
+        -- In case of sold vehicle:
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El vehículo ha sido vendido y no se puede eliminar.';
+    end if;
+end$$
+
+DELIMITER ;
 
 
 

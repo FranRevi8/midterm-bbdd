@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Añadir Vehículo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Añadir Nuevo Vehículo</h1>
+        <form action="/add" method="POST">
+            <div class="form-group">
+                <label for="brand_name">Marca</label>
+                <input type="text" id="brand_name" name="brand_name" required>
+            </div>
+            <div class="form-group">
+                <label for="model">Modelo</label>
+                <input type="text" id="model" name="model" required>
+            </div>
+            <div class="form-group">
+                <label for="year">Año</label>
+                <input type="number" id="year" name="year" required>
+            </div>
+            <div class="form-group">
+                <label for="price">Precio</label>
+                <input type="number" id="price" name="price" step="0.01" required>
+            </div>
+            <button type="submit">Añadir Vehículo</button>
+        </form>
+        <a href="/">Volver a la lista de vehículos</a>
+    </div>
+</body>
+</html>

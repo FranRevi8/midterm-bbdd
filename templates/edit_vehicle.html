@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Vehículo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Modificar Vehículo</h1>
+        <form action="/edit/<int:id>" method="POST">
+            <div class="form-group">
+                <label for="brand_name">Marca</label>
+                <input type="text" id="brand_name" name="brand_name" value="{{ vehicle.brand_name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="model">Modelo</label>
+                <input type="text" id="model" name="model" value="{{ vehicle.model }}" required>
+            </div>
+            <div class="form-group">
+                <label for="year">Año</label>
+                <input type="number" id="year" name="year" value="{{ vehicle.year }}" required>
+            </div>
+            <div class="form-group">
+                <label for="price">Precio</label>
+                <input type="number" id="price" name="price" step="0.01" value="{{ vehicle.price }}" required>
+            </div>
+            <div class="form-group">
+                <label for="color">Color</label>
+                <input type="text" id="color" name="color" value="{{ vehicle.color }}" required>
+            </div>
+            <div class="form-group">
+                <label for="mileage">Kilometraje</label>
+                <input type="number" id="mileage" name="mileage" value="{{ vehicle.mileage }}" required>
+            </div>
+            <div class="form-group">
+                <label for="fuel_type">Tipo de Combustible</label>
+                <input type="text" id="fuel_type" name="fuel_type" value="{{ vehicle.fuel_type }}" required>
+            </div>
+            <div class="form-group">
+                <label for="transmission">Transmisión</label>
+                <input type="text" id="transmission" name="transmission" value="{{ vehicle.transmission }}" required>
+            </div>
+            <button type="submit">Guardar Cambios</button>
+        </form>
+        <a href="{{ url_for('vehicle_detail', vehicle_id=vehicle.id) }}">Cancelar</a>
+    </div>
+</body>
+</html>
