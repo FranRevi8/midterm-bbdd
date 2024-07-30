@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <h1>Modificar Vehículo</h1>
-        <form action="/edit/<int:id>" method="POST">
+        <form action="{{ url_for('edit_vehicle', vehicle_id=vehicle.id) }}" method="POST">
             <div class="form-group">
                 <label for="brand_name">Marca</label>
                 <input type="text" id="brand_name" name="brand_name" value="{{ vehicle.brand_name }}" required>
