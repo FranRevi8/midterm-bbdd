@@ -36,11 +36,19 @@
             </div>
             <div class="form-group">
                 <label for="fuel_type">Tipo de Combustible</label>
-                <input type="text" id="fuel_type" name="fuel_type" value="{{ vehicle.fuel_type }}" required>
+                <select id="fuel_type" name="fuel_type" value="{{ vehicle.fuel_type }}" required>
+                    <option value="Gasoline">Gasoline</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Hybrid">Hybrid</option>
+                    <option value="Electric">Electric</option>
+                </select>
             </div>
             <div class="form-group">
                 <label for="transmission">Transmisión</label>
-                <input type="text" id="transmission" name="transmission" value="{{ vehicle.transmission }}" required>
+                <select id="transmission" name="transmission" value="{{ vehicle.transmission }}" required>
+                    <option value="Automatic">Automatic</option>
+                    <option value="Manual">Manual</option>
+                </select>
             </div>
             <button type="submit">Guardar Cambios</button>
         </form>
