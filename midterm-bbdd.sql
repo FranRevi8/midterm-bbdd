@@ -23,8 +23,8 @@ create table VehicleDetails (
     id_detail INT auto_increment primary key,
     color VARCHAR(30),
     mileage INT,
-    fuel_type VARCHAR(30),
-    transmission VARCHAR(30)
+    fuel_type ENUM("Diesel", "Gasoline", "Electric", "Hybrid"),
+    transmission ENUM("Automatic", "Manual")
 );
 
 -- Create the Customers table
