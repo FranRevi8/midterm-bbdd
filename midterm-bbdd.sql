@@ -23,8 +23,8 @@ create table VehicleDetails (
     id_detail INT auto_increment primary key,
     color VARCHAR(30),
     mileage INT,
-    fuel_type ENUM("Diesel", "Gasoline", "Electric", "Hybrid"),
-    transmission ENUM("Automatic", "Manual")
+    fuel_type ENUM("Diesel", "Gasoline", "Electric", "Hybrid","-"),
+    transmission ENUM("Automatic", "Manual","-")
 );
 
 -- Create the Customers table
@@ -353,10 +353,14 @@ end$$
 
 DELIMITER ;
 
+create table users (
+    id INT auto_increment primary key,
+    username VARCHAR(50) unique not null,
+    password VARCHAR(50) not null,
+    logged_in BOOL default false
+);
 
-
-
-
+insert into users (username, password) values ("admin","admin"), ("revidiego", "revidiego");
 
 
 
