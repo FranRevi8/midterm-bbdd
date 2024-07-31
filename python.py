@@ -135,5 +135,30 @@ def delete_vehicle(vehicle_id):
     
     return redirect(url_for('index'))
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True) 
+        
+        cursor.execute("SELECT * FROM users WHERE username=%s", (username,))
+        user = cursor.fetchone()
+
+        if user and user['password'] == password:
+            cursor.execute("UPDATE users SET logged_in = FALSE")
+            cursor.execute("UPDATE users SET logged_in = TRUE WHERE id = %s", (user['id'],))
+            flash('Login completado!', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('Crendenciales no válidas', 'danger')
+
+        cursor.close()
+        conn.close()
+
+    return render_template('login.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
