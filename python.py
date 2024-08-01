@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import mysql.connector
 
 app = Flask(__name__)
@@ -11,8 +11,14 @@ db_config = {
     'database': 'car_store'
 }
 
+def is_logged_in():
+    return session.get('logged_in', False)
+
 @app.route('/')
 def index():
+    if not is_logged_in():
+        return redirect(url_for('login'))
+
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
     cursor.execute('''
@@ -27,6 +33,9 @@ def index():
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_vehicle():
+    if not is_logged_in():
+        return redirect(url_for('login'))
+    
     if request.method == 'POST':
         brand_name = request.form['brand_name']
         model = request.form['model']
@@ -46,6 +55,9 @@ def add_vehicle():
 
 @app.route('/detail/<int:vehicle_id>')
 def vehicle_detail(vehicle_id):
+    if not is_logged_in():
+        return redirect(url_for('login'))
+    
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
     cursor.execute('''
@@ -62,6 +74,9 @@ def vehicle_detail(vehicle_id):
 
 @app.route('/edit/<int:vehicle_id>', methods=['GET', 'POST'])
 def edit_vehicle(vehicle_id):
+    if not is_logged_in():
+        return redirect(url_for('login'))
+    
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
     
@@ -117,6 +132,9 @@ def edit_vehicle(vehicle_id):
 
 @app.route('/delete/<int:vehicle_id>', methods=['POST'])
 def delete_vehicle(vehicle_id):
+    if not is_logged_in():
+        return redirect(url_for('login'))
+    
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor()
     
@@ -148,6 +166,8 @@ def login():
         user = cursor.fetchone()
 
         if user and user['password'] == password:
+            session['logged_in'] = True
+            session['user_id'] = user['id']
             cursor.execute("UPDATE users SET logged_in = FALSE")
             conn.commit()
             cursor.execute("UPDATE users SET logged_in = TRUE WHERE id = %s", (user['id'],))
@@ -161,6 +181,12 @@ def login():
         conn.close()
 
     return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('Sesión cerrada con éxito', 'success')
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(debug=True)
