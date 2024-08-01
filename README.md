@@ -1,32 +1,37 @@
-Ideas:
-Empiezo pensando en una bbdd para Circle Project, pero no encuentro una forma sencilla y curiosa de hacer que funcione, creo que le falta complejidad (no necesita una bbdd demasiado compleja).
+# Proyecto Midterm: CRM para Venta de Vehículos Usados
 
-Pregunto a Chat GPT para que me de ideas y decido hacer una BBDD para una web de venta de vehículos usados. Haré un CRM, no una web para el usuario final sino algo para los trabajadores del concesionario.
+Este proyecto es un CRM para un concesionario de vehículos usados, desarrollado como parte del curso de Ironhack que estoy estudiando. A continuación, se detalla el proceso de creación y desarrollo del proyecto, que se ha desarrollado en 4 días.
 
-BBDD, creación de la base de datos y de las tablas, al menos de una primera versión.
-En mi experiencia ha sido más sencillo hacer primero un esquema básico (directamente empezar con el script) antes de hacer un modelo conceptual completo, por lo tanto empiezo a meter tablas para hacerme una idea de cómo va a avanzar el proyecto.
+## 1. Idea Inicial
+Originalmente, consideré desarrollar una base de datos (BBDD) para un proyecto llamado Circle Project. Sin embargo, decidí cambiar de dirección y opté por crear una BBDD para una web de venta de vehículos usados, enfocada en ser un CRM para los empleados del concesionario.
 
-Después de hacer una tabla de vehículos y una de clientes, empiezo a re-formular y acabo con:
-Marcas: separa las marcas para normalizar la tabla vehículos. Se podrá usar en la web para hacer filtros.
-Vehículos: la tabla ppal del proyecto, almacena datos básicos de los coches a la venta (y vendidos).
-Detalle Vehículos: se separa de la tabla “vehículos” de forma que podamos establecer una relación one-to-one en la bbdd cumpliendo con ello un requisito del midterm.
-Clientes: la 2a tabla ppal del proyecto: si vendemos coches necesitamos que alguien los compre.
-Ventas: relaciona los clientes y los vehículos y los clientes añadiendo información como el precio final o la fecha de ventas. 
-Extras: cumple otro requisito del midterm, many-to-many.
+## 2. Diseño de la Base de Datos
+### 2.1. Esquema Inicial
+Comencé creando un esquema básico directamente en SQL, lo que me permitió visualizar cómo evolucionaría el proyecto.
 
-	Pido datos mockeados a Chat GPT.
+### 2.2. Tablas Principales
+- **Marcas**: Para normalizar la tabla de vehículos y permitir filtrado.
+- **Vehículos**: Tabla principal que almacena datos básicos de los coches.
+- **Detalle Vehículos**: Relación one-to-one con la tabla Vehículos.
+- **Clientes**: Tabla principal que almacena información de los compradores.
+- **Ventas**: Relaciona clientes y vehículos, añadiendo información como precio final y fecha de venta.
+- **Extras**: Tabla para cumplir el requisito many-to-many del midterm.
 
-Añado ALTERs para añadir las columnas ID necesarias para la relación One-to-One y de paso usar la función alter tal y como se pide en el midterm.
+### 2.3. Mock Data
+Solicité datos mockeados a Chat GPT para poblar las tablas.
 
-Realmente podría normalizar más las tablas, pero no lo hago porque no quiero añadir complejidad a la bbdd. Prefiero centrarme en la parte de las funcionalidades web y no me importa la normalización más allá de lo básico.
+### 2.4. Normalización y ALTERs
+Apliqué normalización básica y añadí columnas ID necesarias para las relaciones one-to-one mediante ALTER TABLE.
 
-Consultas:
-Empiezo por las simples, continúo con las complejas. Preguntar por si hiciese falta más complejidad.
+## 3. Consultas SQL
+Empecé con consultas simples y progresé a consultas más complejas, asegurándome de cumplir con los requisitos del curso.
 
-Funciones:
-Trato de hacer un par de triggers para que, al introducir un vehículo, se me actualicen automáticamente la tabla “marcas” y la tabla “detalles”. No lo consigo y acabo con un procedure que lo soluciona tal y como quería. 
-Añado trigger creado en primera instancia y que no logré que funcionase debido a bucles generados por la IDs:
+## 4. Funciones y Triggers
+### 4.1. Procedimientos y Triggers
+Intenté crear un trigger para actualizar automáticamente las tablas Marcas y Detalle-Vehículos al insertar un vehículo, pero enfrenté problemas con bucles de IDs. por esta razón, lo resolví con un procedimiento almacenado.
 
+**Trigger no funcional que usé:**
+```sql
 DELIMITER $$
 
 CREATE TRIGGER insert_brand_if_not_exists
@@ -34,43 +39,41 @@ BEFORE INSERT ON Vehicles
 FOR EACH ROW
 BEGIN
     DECLARE brand_exists INT;
-    
-    -- Comprobar si la marca ya existe
     SELECT COUNT(*) INTO brand_exists
     FROM Brands
     WHERE id = NEW.brand_id;
-    
-    -- Si la marca no existe, insertarla
     IF brand_exists = 0 THEN
-        INSERT INTO Brands (name) VALUES ('Nueva Marca'); -- PENDIENTE DE CAMBIO, APUNTAR A ESTO DESDE DOM
+        INSERT INTO Brands (name) VALUES ('Nueva Marca');
         SET NEW.brand_id = LAST_INSERT_ID();
     END IF;
 END$$
 
 DELIMITER ;
+```
 
+## 5. Desarrollo Web
+### 5.1. HTML y Python
+Desarrollé la interfaz web con HTML simple y Python para la lógica del servidor.
 
-Empiezo con la web:
-Con un HTML muy simple, empiezo casi directamente con Python. Importaciones y configuración de la bbdd, y empezamos con los métodos.
+### 5.2. Rutas y Decoradores
+- **Principal e Introducción de Coches**: Utilicé métodos GET y POST.
+- **Detalles del Vehículo**: HTML específico para cada coche, mostrando datos de las tablas Vehicles y Vehicle Details.
+- **Edición de Coches**: Incluye lógica para añadir nuevas marcas si no existen.
+- **Eliminación de Coches**: Utiliza un procedimiento en SQL que deshabilita temporalmente las restricciones de claves foráneas para eliminar registros sin problemas.
 
-Decoradores de ruta ppal y para introducir coches:
-Uso el procedimiento creado anteriormente en SQL, lo que hace que funcione todo casi instantáneamente. Eso sí, uso métodos GET y POST, porque añadiendo GET y un IF, cargar las direcciones auxiliares me parece más sencillo. Aparte de esto, utilizo dictionary=true para que los resultados del cursor me dejen acceder a los datos como se suele acceder a un objeto en js y no con las posiciones numéricas (esto hace que todo sea más sencillo en los HTML).
+### 5.3. CSS
+Solicité un CSS sencillo a Chat GPT y realicé modificaciones para adaptar el estilo a mis preferencias.
 
-Decorador para detalles.
-Por la naturaleza de mi bbdd y teniendo en cuenta el diseño que quiero que tenga la web, hacemos un nuevo HTML para cada coche en detalle y lo conectamos con la id de cada vehículo, mostrando los datos de ambas tablas (vehicles y vehicle details).
+## 6. Autenticación y Roles
+### 6.1. Login
+Generé un HTML y un decorador en Python para manejar el login, además de una tabla en SQL para los usuarios.
 
-Decorador para edición de coches:
-	Este tiene la peculiaridad de que, si cambias la marca del coche (que está recogida 
-en “brands” y pones una nueva, obtienes un error. Por lo tanto he tenido que añadir un bloque de código IF que comprueba si la marca existe o no en la BBDD y la añade antes de modificar la id de la brand.
+### 6.2. Roles de Usuario
+Utilicé Flask-Session para gestionar la sesión y definir roles, añadiendo lógica condicional en los decoradores para mostrar información según el rol del usuario.
 
-Decorador para eliminar coches. 
-Después de probar a hacerlo varias veces sin éxito y cambiar el orden en el que se eliminan las cosas para no interferir en las claves foráneas, me doy por vencido. Genero un procedimiento en SQL (como lo que hacía para añadir coches) y encuentro como solución a lo de las claves foráneas el 
-set FOREIGN_KEY_CHECKS = 0;
-lo que inhabilita los foreign key mientras elimino las filas de las dos tablas de vehículo, para luego restaurar 
-set FOREIGN_KEY_CHECKS = 1;
-Con eso funciona a la perfección. (hacemos uso del procedimiento desde el decorador al igual que con add.
-En cualquiera de los casos, mi orientación original para las eliminaciones siempre respeta el historial de vehículos vendidos, de manera que si el coche existe en la tabla sales, no se puede eliminar para garantizar que no se borra el historial de ventas. Añado flash messages para dar un mensaje de éxito o error cuando se haga una eliminación.
+### 6.3. Modificaciones en HTML
+Adapté los HTML para incluir funcionalidades de login y logout, y ajusté las vistas según el rol del usuario.
 
-CSS:
-Solicito a Chat GPT un css sencillito y las webs se convierten en una cosa mucho mejor. Hago pequeñas modificaciones para adaptarlo a mi gusto.
+## 7. Conclusión
+Este proyecto midterm me permitió aplicar conocimientos de SQL, Python y desarrollo web para crear un CRM funcional para la venta de vehículos usados. A lo largo del desarrollo, enfrenté y resolví varios desafíos técnicos, lo que me brindó una valiosa experiencia práctica y me permitió aprender nuevas soluciones a problemas clásicos de este tipo de proyectos.
 
