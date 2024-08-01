@@ -333,6 +333,10 @@ end$$
 
 DELIMITER ;
 
+-- For the elimination of a vehicle, we will check if the vehicle has been sold, so the sold vehicles 
+-- can't be deleted for history reasons. **I have to put the foreign keays off, because the one-to-one
+-- relationship, as i have done it, doesn't allow the elimination in other case.**
+
 DELIMITER $$
 
 create procedure delete_vehicle_and_details(in p_vehicle_id INT)
@@ -361,6 +365,8 @@ end$$
 
 DELIMITER ;
 
+-- We create the Users table to save users and their log status.
+
 create table users (
     id INT auto_increment primary key,
     username VARCHAR(50) unique not null,
@@ -369,6 +375,8 @@ create table users (
 );
 
 insert into users (username, password) values ("admin","admin"), ("accountability", "accountability");
+
+-- After a few tests and with the decorator working, we add some roles to manage the permissions.
 
 alter table users add column role VARCHAR(20) DEFAULT 'no-permission';
 
