@@ -149,7 +149,9 @@ def login():
 
         if user and user['password'] == password:
             cursor.execute("UPDATE users SET logged_in = FALSE")
+            conn.commit()
             cursor.execute("UPDATE users SET logged_in = TRUE WHERE id = %s", (user['id'],))
+            conn.commit()
             flash('Login completado!', 'success')
             return redirect(url_for('index'))
         else:
