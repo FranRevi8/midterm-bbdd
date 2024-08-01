@@ -17,6 +17,8 @@ Comencé creando un esquema básico directamente en SQL, lo que me permitió vis
 - **Ventas**: Relaciona clientes y vehículos, añadiendo información como precio final y fecha de venta.
 - **Extras**: Tabla para cumplir el requisito many-to-many del midterm.
 
+![ERD diagrama](./IMGs/ERD.png)
+
 ### 2.3. Mock Data
 Solicité datos mockeados a Chat GPT para poblar las tablas.
 
