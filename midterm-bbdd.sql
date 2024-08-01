@@ -72,7 +72,9 @@ INSERT INTO Brands (name) VALUES
 ('Audi'), 
 ('Nissan'), 
 ('Hyundai'), 
-('Kia');
+('Kia'),
+('Skoda'),
+('Volkswagen');
 
 -- Insert vehicles
 INSERT INTO Vehicles (brand_id, model, year, price) VALUES
@@ -85,7 +87,10 @@ INSERT INTO Vehicles (brand_id, model, year, price) VALUES
 (7, 'A4', 2021, 38000.00),
 (8, 'Altima', 2016, 16000.00),
 (9, 'Elantra', 2018, 17000.00),
-(10, 'Sportage', 2019, 22000.00);
+(10, 'Sportage', 2019, 22000.00),
+(5, '3 Series', 2023, 42000.00),
+(11, 'Octavia', 2021, 37000.00),
+(12, 'Arteon', 2019, 28000.00);
 
 -- Insert vehicle details
 INSERT INTO VehicleDetails (color, mileage, fuel_type, transmission) VALUES
@@ -98,7 +103,10 @@ INSERT INTO VehicleDetails (color, mileage, fuel_type, transmission) VALUES
 ('Blue', 5000, 'Gasoline', 'Automatic'),
 ('White', 60000, 'Gasoline', 'Manual'),
 ('Red', 35000, 'Gasoline', 'Automatic'),
-('Gray', 30000, 'Gasoline', 'Manual');
+('Gray', 30000, 'Gasoline', 'Manual'),
+('Black', 15000, 'Diesel', 'Automatic'),
+('Black', 45000, 'Hybrid', 'Automatic'),
+('Yellow', 30000, 'Gasoline', 'Manual');
 
 -- Insert customers
 INSERT INTO Customers (name, email, phone) VALUES

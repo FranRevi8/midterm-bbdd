@@ -26,19 +26,8 @@ def get_user_role():
             return user['role']
     return None
 
-def new_session():
-    conn = mysql.connector.connect(**db_config)
-    cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("UPDATE users SET logged_in = FALSE")
-    conn.commit()
-
-    return None
-
 @app.route('/')
 def index():
-    new_session()
-
     if not is_logged_in():
         return redirect(url_for('login'))
 
