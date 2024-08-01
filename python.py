@@ -14,18 +14,52 @@ db_config = {
 def is_logged_in():
     return session.get('logged_in', False)
 
+def get_user_role():
+    if 'user_id' in session:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT role FROM users WHERE id = %s", (session['user_id'],))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if user:
+            return user['role']
+    return None
+
+def new_session():
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("UPDATE users SET logged_in = FALSE")
+    conn.commit()
+
+    return None
+
 @app.route('/')
 def index():
+    new_session()
+
     if not is_logged_in():
         return redirect(url_for('login'))
 
+    role = get_user_role()
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
-    cursor.execute('''
-        SELECT v.id, v.model, v.year, v.price, b.name AS brand_name
-        FROM Vehicles v
-        JOIN Brands b ON v.brand_id = b.id
-    ''')
+
+    if role == 'accountability':
+        cursor.execute('''
+            SELECT v.id, v.model, v.year, v.price, b.name AS brand_name
+            FROM Vehicles v
+            JOIN Brands b ON v.brand_id = b.id
+            JOIN Sales s ON v.id = s.vehicle_id
+        ''')
+    else:
+        cursor.execute('''
+            SELECT v.id, v.model, v.year, v.price, b.name AS brand_name
+            FROM Vehicles v
+            JOIN Brands b ON v.brand_id = b.id
+        ''')
+
     vehicles = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -35,6 +69,11 @@ def index():
 def add_vehicle():
     if not is_logged_in():
         return redirect(url_for('login'))
+    
+    role = get_user_role()
+    if role != 'admin':
+        flash('No tienes permiso para acceder a esta página.', 'danger')
+        return redirect(url_for('index'))
     
     if request.method == 'POST':
         brand_name = request.form['brand_name']
@@ -76,6 +115,11 @@ def vehicle_detail(vehicle_id):
 def edit_vehicle(vehicle_id):
     if not is_logged_in():
         return redirect(url_for('login'))
+    
+    role = get_user_role()
+    if role != 'admin':
+        flash('No tienes permiso para editar', 'danger')
+        return redirect(url_for('index'))
     
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
@@ -143,7 +187,7 @@ def delete_vehicle(vehicle_id):
         conn.commit()
         flash('Vehículo eliminado con éxito', 'success')
     except mysql.connector.Error as err:
-        if err.errno == 1644:  # SQLSTATE '45000' Custom error
+        if err.errno == 1644:
             flash(err.msg, 'danger')
         else:
             flash('Error al eliminar el vehículo', 'danger')

@@ -347,7 +347,7 @@ begin
         set FOREIGN_KEY_CHECKS = 1;
     else
         -- In case of sold vehicle:
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El vehículo ha sido vendido y no se puede eliminar.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El vehículo ha sido vendido y no se puede eliminar';
     end if;
 end$$
 
@@ -360,11 +360,12 @@ create table users (
     logged_in BOOL default false
 );
 
-insert into users (username, password) values ("admin","admin"), ("revidiego", "revidiego");
+insert into users (username, password) values ("admin","admin"), ("accountability", "accountability");
 
+alter table users add column role VARCHAR(20) DEFAULT 'no-permission';
 
-
-
+update users set role = 'admin' where id = 1;
+update users set role = 'accountability' where id = 2;
 
 
 
